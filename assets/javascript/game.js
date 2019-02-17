@@ -2,15 +2,14 @@
 var rpgGame = {
   gameStarted: false,
   playerChosen: false,
-  startGame: function() {
-    // can probably be in handles in choosing the character
-  }, 
+  characters: [],
   setupGame: function() {
+    // setup character select area
+    $('.gameWrapper').append('<div id="characterSelect"></div>');
     // generateCharacters
     this.generateCharacters();
     this.stageCharacters();
   },
-  characters: [],
   generateCharacters: function(){
     var that = this;
     
@@ -40,13 +39,23 @@ var rpgGame = {
           + value.name +
         '</h3></div>');
     }) 
+
+    $('.select').click(function() {
+      rpgGame.choosePlayer($(this).data("character"))
+    })
+
   },
   choosePlayer: function(a) {
     this.characters[a].chosen = true;
     this.playerChosen = true;
     
     // clear board and setup competion layout
+    $('.select').off();
     $('#characterSelect').remove();
+    $('.gameWrapper').append('<div id="battlefield"></div>');
+    $('#battlefield').append('<div id="player1"></div>');
+    $('#battlefield').append('<div id="competitors"></div>');
+    
     $('#player1').append(
       '<div class="characterCard chosen"><h3>'
         + this.characters[a].name +
@@ -56,26 +65,24 @@ var rpgGame = {
     $.each(this.characters, function(index, value) {
       if (!value.chosen) {
         $('#competitors').append(
-          '<div class="characterCard select" data-character=' + index + '><h3>'
+          '<div class="characterCard selectCompetitor" data-character=' + index + '><h3>'
             + value.name +
           '</h3></div>')
       }
     })
-    
 
+    $('.selectCompetitor').click(function() {
+      console.log('select competitor...')
+    })
+        
   },
   chooseEnemy: function() {},
-  attack: function() {},
+  attack: function() {
+
+  },
   score: function() {},
 }
 
 rpgGame.setupGame();
 
-$('.select').click(function() {
-  if (!rpgGame.playerChosen) {
-    rpgGame.choosePlayer($(this).data("character"))
-  } else {
-    console.log('choose enemy...')
-  }
-})
 
