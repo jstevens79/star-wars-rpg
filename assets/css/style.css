@@ -1,4 +1,7 @@
 
+* { 
+  box-sizing: border-box;
+}
 
 .gameWrapper {
   width: 100%;
@@ -18,19 +21,38 @@
   border-radius: 8px;
   background: white;
   margin: 10px;
-  flex: 1;
+  flex: 1 1 0;
   text-align: center;
+  min-width: 25%;
+  max-width: 25%;
 }
 
 #player1 {
   flex: 1;
+  padding: 10px;
+}
+
+.chosenCompetitor {
+  min-width: auto;
+  max-width: calc(100% - 40px);
+}
+
+#player1  .characterCard {
+  min-width: calc(100% - 40px);
+  max-width:  calc(100% - 40px);
+  width: calc(100% - 40px);
 }
 
 #battlefield {
   background: black;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
+}
+
+.controls {
+  width: 100%;
 }
 
 #competitors {
