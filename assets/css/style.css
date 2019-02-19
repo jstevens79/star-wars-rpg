@@ -23,8 +23,9 @@
   margin: 10px;
   flex: 1 1 0;
   text-align: center;
-  min-width: 25%;
-  max-width: 25%;
+  min-width: 200px;
+  max-width: 300px;
+  min-height: 200px;
 }
 
 #player1 {
@@ -37,9 +38,8 @@
   max-width: calc(100% - 40px);
 }
 
-#player1  .characterCard {
+#player1 .characterCard {
   min-width: calc(100% - 40px);
-  max-width:  calc(100% - 40px);
   width: calc(100% - 40px);
 }
 
@@ -59,4 +59,8 @@
   flex: 1;
   display: flex;
   flex-wrap: wrap;
+}
+
+.select:hover, .selectCompetitor:hover {
+  cursor: pointer;
 }

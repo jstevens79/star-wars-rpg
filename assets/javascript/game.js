@@ -3,6 +3,7 @@ var rpgGame = {
   gameStarted: false,
   playerChosen: null,
   enemyChosen: null,
+  attacking: false,
   characters: [],
   setupGame: function () {
     // reset everything
@@ -28,7 +29,7 @@ var rpgGame = {
         attack: attack,
         currentAttack: attack,
         counterAttack: counterAttack,
-        played: false
+        defeated: false
       }
       that.characters.push(character);
     }
@@ -46,18 +47,17 @@ var rpgGame = {
 
   characterCard: function (a, ind, classy) {
     // setup and return a character card
-    return "<div class='characterCard " +classy + "' data-character='" + ind + "'><h3>" 
-        + a.name + "</h3><div class='stats'>" + a.health + "</div></div>"
+    var defeatedCheck = (a.defeated) ? ' defeated' : '';
+    return "<div class='characterCard " + classy + defeatedCheck + "' data-character='" + ind + "'><h3>" 
+      + a.name + "</h3><div class='stats'>" + a.health + "</div></div>"
   },
 
   reRenderCards: function () {
     // maybe just change out health here?
     $('#player1').empty();
     $('#player1').append(this.characterCard(this.characters[this.playerChosen], this.playerChosen, 'chosen'));
-
     $('#competitors').empty();
     $('#competitors').append(this.characterCard(this.characters[this.enemyChosen], this.enemyChosen, 'chosenCompetitor'));
-
   },
 
   stageCharacters: function () {
@@ -68,7 +68,6 @@ var rpgGame = {
     $('.select').click(function () {
       rpgGame.choosePlayer($(this).data("character"))
     })
-
   },
 
   choosePlayer: function (a) {
@@ -88,7 +87,6 @@ var rpgGame = {
   },
 
   stageEnemies: function () {
-
     $('#competitors').empty();
 
     $.each(this.characters, function (index, value) {
@@ -107,7 +105,6 @@ var rpgGame = {
     $('#chooseNew').click(function () {
       rpgGame.setupGame();
     })
-
   },
 
   chooseEnemy: function (a) {
@@ -117,30 +114,36 @@ var rpgGame = {
     $('#battlefield').append('<div class="controls"><button id="attack">Attack!</button>');
 
     $('#attack').click(function () {
-      rpgGame.attack();
+      if (!rpgGame.attacking) {
+        rpgGame.attack();
+      }
     })
-
   },
 
   attack: function () {
     var Player = this.characters[this.playerChosen];
     var Enemy = this.characters[this.enemyChosen];
+    this.attacking = true;
 
     // attack the enemy
-    Enemy.health = Enemy.health - Player.currentAttack;
+    var updatedEnemyHealth = Enemy.health - Player.currentAttack;
+    Enemy.health = (updatedEnemyHealth <= 0) ? 0 : updatedEnemyHealth;
+    Enemy.defeated = (Enemy.health === 0) ? true : false;
     // increase the attack power
     Player.currentAttack = Player.currentAttack + Player.attack;
-
-    // enemy counter attack 
-    Player.health = Player.health - Enemy.counterAttack;
-
-    console.log(Player.health, Enemy.health);
-
     this.reRenderCards();
 
-    // score
-    this.score();
+    setTimeout(function() {
+      var updatedHealth = Player.health - Enemy.counterAttack;
+      Player.health = (updatedHealth <= 0) ? 0 : updatedHealth;
+      console.log(Player.health)
+      this.reRenderCards();
+      this.attacking = false;
 
+      this.score();
+    }.bind(this), 1500)
+    
+    
 
   },
 
@@ -148,21 +151,38 @@ var rpgGame = {
     var playerDefeated = (this.characters[this.playerChosen].health <= 0) ? true : false;
     var enemyDefeated = (this.characters[this.enemyChosen].health <= 0) ? true : false;
 
-    console.log(playerDefeated, enemyDefeated)
-
     if (playerDefeated) {
-      console.log('you lose');
+      $('#attack').remove();
+      alert('you lose!');
     }
 
     if (enemyDefeated) {
       setTimeout(function() {
         this.stageEnemies();
+        $('#attack').remove();
+        if (this.checkIfAllDefeated()) {
+          alert('you won!');
+        }
       }.bind(this), 1500);
     }
 
-
-
   },
+
+  checkIfAllDefeated: function() {
+    var allDefeated = true;
+    $.each(this.characters, function(index, value) {
+      if (index !== this.playerChosen) {
+        if (value.defeated === false) {
+          allDefeated = false;
+          return;
+        }
+      }
+    }.bind(this));
+    return allDefeated;
+  }
 }
 
+
+
 rpgGame.setupGame();
+rpgGame.checkIfAllDefeated();
