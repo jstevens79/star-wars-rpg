@@ -7,16 +7,17 @@ var rpgGame = {
   characters: [],
   setupGame: function () {
     // reset everything
-    $('.gameWrapper').empty();
+    $('#gameWrapper').empty();
     this.characters = [];
     this.playerChosen = null;
     this.enemyChosen = null;
 
     // setup character select area
-    $('.gameWrapper').append('<div id="characterSelect"></div>');
+    $('#gameWrapper').append('<div id="characterSelect"></div>');
     // generateCharacters
     this.generateCharacters();
     this.stageCharacters();
+    $('#gameWrapper').prepend('<div id="instructions"><p>Select your player.</p></div>');
   },
 
   generateCharacters: function () {
@@ -76,7 +77,7 @@ var rpgGame = {
     // clear board and setup competion layout
     $('.select').off();
     $('#characterSelect').remove();
-    $('.gameWrapper').append('<div id="battlefield"></div>');
+    $('#gameWrapper').append('<div id="battlefield"></div>');
     $('#battlefield').append('<div id="player1"><button id="chooseNew">Change character.</button></div>');
     $('#battlefield').append('<div id="competitors"></div>');
 
@@ -88,6 +89,7 @@ var rpgGame = {
 
   stageEnemies: function () {
     $('#competitors').empty();
+    $('#instructions').empty().append('<p>Choose your opponent.</p>');
 
     $.each(this.characters, function (index, value) {
       if (index !== this.playerChosen) {
@@ -95,7 +97,7 @@ var rpgGame = {
       }
     }.bind(this))
 
-    $('.selectCompetitor').click(function () {
+    $('.selectCompetitor').not('.defeated').click(function () {
       $('#chooseNew').off();
       $('#chooseNew').remove();
       $('.selectCompetitor').off();
@@ -133,18 +135,17 @@ var rpgGame = {
     Player.currentAttack = Player.currentAttack + Player.attack;
     this.reRenderCards();
 
+    console.log(Player.currentAttack);
+
     setTimeout(function() {
       var updatedHealth = Player.health - Enemy.counterAttack;
       Player.health = (updatedHealth <= 0) ? 0 : updatedHealth;
-      console.log(Player.health)
       this.reRenderCards();
       this.attacking = false;
 
       this.score();
     }.bind(this), 1500)
     
-    
-
   },
 
   score: function () {
@@ -153,7 +154,7 @@ var rpgGame = {
 
     if (playerDefeated) {
       $('#attack').remove();
-      alert('you lose!');
+      this.restartGameButton('Try again');
     }
 
     if (enemyDefeated) {
@@ -161,7 +162,7 @@ var rpgGame = {
         this.stageEnemies();
         $('#attack').remove();
         if (this.checkIfAllDefeated()) {
-          alert('you won!');
+          this.restartGameButton('Play again');
         }
       }.bind(this), 1500);
     }
@@ -179,10 +180,13 @@ var rpgGame = {
       }
     }.bind(this));
     return allDefeated;
+  },
+
+  restartGameButton: function(a) {
+    console.log('yeah..')
+    $('#gameWrapper').append('<button onclick="rpgGame.setupGame()" id="restart">' + a + '</button>');
   }
+
 }
 
-
-
 rpgGame.setupGame();
-rpgGame.checkIfAllDefeated();
