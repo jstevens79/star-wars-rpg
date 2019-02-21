@@ -20,9 +20,7 @@ var rpgGame = {
     this.generateCharacters();
 
     var stage = $('<div>').addClass('stage');
-
     var gameInstructions = $('<h1>').addClass('instructions').text('Choose your character.');
-
     var battleArea = $('<div>').addClass('battleArea');
 
     // setup character select area
@@ -38,7 +36,6 @@ var rpgGame = {
     // add characters to characterSelect
     this.stageCharacters();
     
-   
   },
 
   generateCharacters: function () {
@@ -166,9 +163,7 @@ var rpgGame = {
           rpgGame.attack();
         }
       })
-
     });
-        
     
   },
 
@@ -189,7 +184,6 @@ var rpgGame = {
     var updatedEnemyHealth = Enemy.health - Player.currentAttack;
     Enemy.health = (updatedEnemyHealth <= 0) ? 0 : updatedEnemyHealth;
     Enemy.defeated = (Enemy.health === 0) ? true : false;
-    // increase the attack power
     Player.currentAttack = Player.currentAttack + Player.attack;
 
     setTimeout(function() {
@@ -198,6 +192,7 @@ var rpgGame = {
       $('[data-character="' + this.playerChosen + '"]').addClass('gettingAttacked');
     }.bind(this), 1200)
     
+    // get attacked
     setTimeout(function() {
       var updatedHealth = Player.health - Enemy.counterAttack;
       Player.health = (updatedHealth <= 0) ? 0 : updatedHealth;
@@ -223,7 +218,6 @@ var rpgGame = {
       $('.attack').remove();
       setTimeout(function() {
         if (this.checkIfAllDefeated()) {
-          alert('play again')
           this.restartGameButton('Play again');
           $('.attackBar').append('<button onclick="rpgGame.setupGame()">You won! Play again?</button>');
         } else {
