@@ -65,14 +65,13 @@ header {
   border-top-right-radius: 10px;
 }
 
-.characterSelect {
-  width: 100%;
-  display: flex;
-  flex-wrap: wrap;
-  border-radius: 8px;
-  justify-content: center;
-  padding: 20px;
-  margin-bottom: 20px;
+.instructions {
+  margin: 0 40px;
+  padding: 20px 20px 20px 20px;
+  border-bottom: solid 2px rgba(255,255,255,0.2);
+  text-align: center;
+  font-size: 1.4em;
+  color: white;
 }
 
 /*-- CHARACTER CARD --*/
@@ -81,9 +80,8 @@ header {
   border-radius: 8px;
   background: white;
   margin: 10px;
-  flex: 0;
   text-align: center;
-  min-width: 260px;
+  width: 260px;
   background: #282727;
   overflow: hidden;
   display: flex;
@@ -95,6 +93,8 @@ header {
 }
 
 .characterCard img {
+  width: 100%;
+  height: auto;
   flex: 0;
 }
 
@@ -120,14 +120,66 @@ header {
   font-size: .8em;
 }
 
-.characterCard:hover {
+.characterCard.select:hover {
   box-shadow: 0 0 13px #4373BF;
   transform: scale(1.05);
 }
 
-.characterCard:hover h3 {
+.characterCard.select:hover h3 {
   color: #4373BF;
 }
+
+.characterSelect {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding: 20px;
+}
+
+.battleArea {
+  width: 100%;
+  border-radius: 8px;
+  justify-content: center;
+  padding: 20px;
+  margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.battle {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-content: stretch;
+  justify-content: center;
+}
+
+.attackBar {
+  width: 100%;
+  height: 100px;
+  padding: 20px;
+  text-align: center;
+  align-self: flex-end;
+}
+
+.battlePlayer, .battleEnemy {
+  padding: 20px;
+  align-self: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.battlePlayer .characterCard, .battleEnemy .characterCard {
+  width: 350px;
+}
+
 
 /*-- -- */
 
@@ -136,9 +188,7 @@ header {
   padding: 10px;
 }
 
-.chosenCompetitor {
-  max-width: calc(100% - 40px);
-}
+
 
 .player .characterCard {
   min-width: calc(100% - 40px);
@@ -204,13 +254,15 @@ header {
 }
 
 button {
-  background: gray;
+  background: #4373BF;
   border: none;
   outline: none;
-  padding: 10px 20px;
+  padding: 20px 40px;
   border-radius: 8px;
   font-weight: 700;
   cursor: pointer;
+  font-size: 1.3em;
+  color: white;
 }
 
 button:hover {

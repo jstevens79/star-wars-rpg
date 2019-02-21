@@ -21,9 +21,15 @@ var rpgGame = {
 
     var stage = $('<div>').addClass('stage');
 
+    var gameInstructions = $('<h1>').addClass('instructions').text('Choose your character.');
+
+    var battleArea = $('<div>').addClass('battleArea');
+
     // setup character select area
     var characterSelect = $("<div>").addClass("characterSelect");
-    stage.append(characterSelect);
+    battleArea.append(characterSelect);
+
+    stage.append(gameInstructions).append(battleArea);
 
     // setup the controls area
     var controls = $('<div>').addClass('controls').toggle();    
@@ -75,7 +81,7 @@ var rpgGame = {
     var stats = $("<div>")
       .addClass('characterStats')
       .append("<h3>" + a.name + "</h3>")
-      .append("<span class='stats'><i class='fas fa-heart'></i></i> " + a.health + "</span>");
+      .append("<span class='stats'><i class='fas fa-heart'></i></i> <span class='health'>" + a.health + "</span></span>");
 
     card.append(stats);
 
@@ -84,11 +90,14 @@ var rpgGame = {
   },
 
   reRenderCards: function () {
-    // maybe just change out health here?
-    $('.player').empty();
-    $('.player').append(this.characterCard(this.characters[this.playerChosen], this.playerChosen, 'chosen'));
-    $('#competitors').empty();
-    $('#competitors').append(this.characterCard(this.characters[this.enemyChosen], this.enemyChosen, 'chosenCompetitor'));
+    // update the character cards
+    $('.characterCard').each(function(i, obj) {
+      var c = $(this).data("character");
+      $(this).find('.health').text(rpgGame.characters[c].health)
+    })
+    // update the chosen player stats
+    $('.controls').find('.health').text(rpgGame.characters[rpgGame.playerChosen].health);
+    $('.controls').find('.attack').text(rpgGame.characters[rpgGame.playerChosen].currentAttack);
   },
 
   stageCharacters: function () {
@@ -109,6 +118,7 @@ var rpgGame = {
   choosePlayer: function (a) {
       this.playerChosen = a;
       this.updatePlayerDash();
+      $('.instructions').text('Choose your foe');
       $('.controls').toggle("slow");
   },
 
@@ -122,7 +132,7 @@ var rpgGame = {
     var playerName = $('<h3>').text(player.name);
     var powers = $('<div>')
       .addClass('powerStats')
-      .append("<div class='stats'><i class='fas fa-heart'></i></i> " + player.health + " <span class='blue'>// Attack Power: " + player.currentAttack + "<span></div>"); 
+      .append("<div class='stats'><i class='fas fa-heart'></i></i> <span class='health'>" + player.health + "</span> <span class='blue'>// Attack Power: <span class='attack'>" + player.currentAttack + "</span><span></div>"); 
     
 
     $('.controls').append(yourPlayer).append(playerPic).append(playerName).append(powers);
@@ -151,20 +161,31 @@ var rpgGame = {
   },
 
   chooseEnemy: function (a) {
-    $('.characterSelect').fadeTo("fast", 0);
     this.enemyChosen = a;
-    $('.enemyStats').text(this.characters[a].name);
-    $('.enemy').empty().append(this.characterCard(this.characters[a], a, 'chosenCompetitor'));
-    
-    //$('#chooseNew').remove();
-    
-    $('.battlefield').append('<div class="controls"><button id="attack">Attack!</button>');
 
-    $('#attack').click(function () {
-      if (!rpgGame.attacking) {
-        rpgGame.attack();
-      }
-    })
+    $('.characterSelect').fadeTo("fast", 0, function() {
+      var battle = $('<div>').addClass('battle');
+      var player = $('<div>')
+        .addClass('battlePlayer')
+        .append(rpgGame.characterCard(rpgGame.characters[rpgGame.playerChosen], rpgGame.playerChosen, 'chosen'));
+      var enemy = $('<div>')
+        .addClass('battleEnemy')
+        .append(rpgGame.characterCard(rpgGame.characters[rpgGame.enemyChosen], rpgGame.enemyChosen, 'chosenCompetitor'));
+      var attackArea = $('<div>').addClass('attackBar');
+      var attackButton = $('<button>').addClass('attack').text('Attack');
+      attackArea.append(attackButton);
+      battle.append(player).append(enemy).append(attackArea);
+      $('.battleArea').append(battle);
+
+      $('.attack').click(function () {
+        if (!rpgGame.attacking) {
+          rpgGame.attack();
+        }
+      })
+
+    });
+        
+    
   },
 
   attack: function () {
@@ -177,10 +198,10 @@ var rpgGame = {
     Enemy.health = (updatedEnemyHealth <= 0) ? 0 : updatedEnemyHealth;
     Enemy.defeated = (Enemy.health === 0) ? true : false;
     // increase the attack power
-    Player.currentAttack = Player.currentAttack + Player.attack;
-    this.reRenderCards();
-
     console.log(Player.currentAttack);
+    Player.currentAttack = Player.currentAttack + Player.attack;
+    console.log(Player.currentAttack);
+    this.reRenderCards();
 
     setTimeout(function() {
       var updatedHealth = Player.health - Enemy.counterAttack;
