@@ -25,18 +25,50 @@ body {
   position: relative;
 }
 
+.stage {
+  margin: 0 auto;
+  background: rgba(0,0,0,0.4);
+  border-radius: 8px;
+  position: relative;
+}
+
+.stage::before {
+  content: '';
+  display: block;
+  border-left: solid 3px #4373BF;
+  border-bottom: solid 3px #4373BF;
+  position: absolute;
+  left: -10px;
+  bottom: -10px;
+  width: 20%;
+  height: 40%;
+  border-bottom-left-radius: 12px;
+}
+
+.stage::after {
+  content: '';
+  display: block;
+  border-top: solid 2px white;
+  border-right: solid 2px white;
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  width: 10%;
+  height: 18%;
+  border-top-right-radius: 10px;
+}
+
 .characterSelect {
   width: 100%;
-  margin: 0 auto;
   display: flex;
   flex-wrap: wrap;
   border-radius: 8px;
   justify-content: center;
-  border-radius: 8px;
-  background: rgba(0,0,0,0.4);
   padding: 20px;
   margin-bottom: 20px;
 }
+
+/*-- CHARACTER CARD --*/
 
 .characterCard {
   border-radius: 8px;
@@ -56,15 +88,6 @@ body {
   transition: transform .25s ease-in-out, box-shadow .25s ease;
 }
 
-.characterCard:hover {
-  box-shadow: 0 0 13px #4373BF;
-  transform: scale(1.05);
-}
-
-.characterCard:hover h3 {
-  color: #4373BF;
-}
-
 .characterCard img {
   flex: 0;
 }
@@ -76,6 +99,9 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  background: url('../images/bg_hash_top-dca2c5ab1b2e.png');
+  background-repeat: repeat-x;
+  background-position: top;
 }
 
 .characterCard h3 {
@@ -87,6 +113,17 @@ body {
   color: #e15021;
   font-size: .8em;
 }
+
+.characterCard:hover {
+  box-shadow: 0 0 13px #4373BF;
+  transform: scale(1.05);
+}
+
+.characterCard:hover h3 {
+  color: #4373BF;
+}
+
+/*-- -- */
 
 .player {
   flex: 1;
@@ -102,50 +139,19 @@ body {
   width: calc(100% - 40px);
 }
 
-/* ---- battlefield area ---- */
+/* ---- control area ---- */
 
-.battlefield {
+.controls {
+  min-height: 100px;
+  padding: 20px;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   max-height: 100%;
   background: black;
   border-radius: 8px;
 }
-
-.battlingCharacters {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.battlingCharacters .player, .enemy {
-  flex: 1;
-  max-width: 260px;
-  border: 1px solid gray;
-  border-radius: 8px;
-}
-
-.battlefieldControls {
-  padding: 20px;
-}
-
-.battlefield #competitors {
-  flex: 1.4;
-}
-
-.controls {
-  width: 100%;
-}
-
-#competitors {
-  flex: 1;
-  display: flex;
-  flex-wrap: wrap;
-}
-
 
 .select:hover, .selectCompetitor:hover {
   cursor: pointer;

@@ -15,38 +15,51 @@ var rpgGame = {
     // create characters object
     this.generateCharacters();
 
+    var stage = $('<div>').addClass('stage');
+
     // setup character select area
     var characterSelect = $("<div>").addClass("characterSelect");
-    //characterSelect.prepend('<div id="instructions"><p>Select your player.</p></div>')
-    $('#gameWrapper').append(characterSelect);
+    stage.append(characterSelect);
+
+    // setup the controls area
+    var controls = $('<div>').addClass('controls');
+    var playerStats = $('<div>').addClass('playerStats').text('player stats');
+    var actionArea = $('<div>').addClass('actionArea').text('Choose your player');
+    var gameStats = $('<div>').addClass('enemyStats').text('foe');
+
+    controls.append(playerStats).append(actionArea).append(gameStats);
     
+    $('#gameWrapper').append(stage).append(controls);
+
     // add characters to characterSelect
     this.stageCharacters();
+    
+   
   },
 
   generateCharacters: function () {
     var that = this;
 
-    function addCharacter(name, health, attack, counterAttack) {
+    function addCharacter(name, health, attack, counterAttack, image) {
       var character = {
         name: name,
         health: health,
         attack: attack,
         currentAttack: attack,
         counterAttack: counterAttack,
-        defeated: false
+        defeated: false,
+        image: image
       }
       that.characters.push(character);
     }
 
-    //name, health, attack, counterAttack
-    addCharacter('luke skywalker', 160, 20, 15);
-    addCharacter('darth vader', 200, 25, 22);
-    addCharacter('yoda', 190, 24, 20);
-    addCharacter('kylo ren', 140, 18, 20);
-    addCharacter('rey', 130, 15, 15);
-    //addCharacter('boba fett', 120, 10, 15);
-    addCharacter('chewbacca', 160, 22, 25);
+    //name, health, attack, counterAttack, image
+    addCharacter('luke skywalker', 160, 20, 15, './assets/images/skywalker.jpg');
+    addCharacter('darth vader', 200, 25, 22, './assets/images/vader.jpg');
+    addCharacter('yoda', 190, 24, 20, './assets/images/yoda.jpg');
+    addCharacter('kylo ren', 140, 18, 20, './assets/images/kylo.jpg');
+    addCharacter('rey', 130, 15, 15, './assets/images/rey.jpg');
+    addCharacter('chewbacca', 160, 22, 25, './assets/images/chewy.jpg');
 
   },
 
@@ -59,7 +72,7 @@ var rpgGame = {
       .addClass(classy)
       .addClass(defeatedCheck)
       .attr('data-character', ind)
-      .append("<img src='https://via.placeholder.com/260x140'>");
+      .append("<img alt='" + a.name + "' src='" + a.image + "'>");
 
     var stats = $("<div>")
       .addClass('characterStats')
@@ -70,6 +83,10 @@ var rpgGame = {
 
     return card;
     
+  },
+
+  updatePlayerDash: function () {
+    $('.playerStats').text(this.characters[this.playerChosen].name)
   },
 
   reRenderCards: function () {
@@ -86,39 +103,19 @@ var rpgGame = {
     }.bind(this))
 
     $('.select').click(function () {
-      rpgGame.choosePlayer($(this).data("character"))
-      $(this).remove();
+      if (rpgGame.playerChosen === null) {
+        rpgGame.choosePlayer($(this).data("character"));
+        $(this).remove();
+      } else {
+        rpgGame.chooseEnemy($(this).data("character"));
+      }
     })
   },
 
   choosePlayer: function (a) {
-
-    if ( this.playerChosen === null ) {
-
       this.playerChosen = a;
-    
-      var battlefield = $('<div>').addClass('battlefield');
-      
-      var battlefieldControls = $('<div>').addClass('battlefieldControls');
-      battlefieldControls.append('<button id="chooseNew">Change character</button>');
-
-      var battlingCharacters = $('<div>').addClass('battlingCharacters');
-      
-      var player = $('<div>').addClass('player');
-      player.prepend(this.characterCard(this.characters[a], a, 'chosen'));
-
-      var enemy = $('<div>').addClass('enemy').text('Choose an enemy');
-
-      battlingCharacters.append(player).append(enemy);
-
-      battlefield.append(battlingCharacters).append(battlefieldControls);
-
-      $('#gameWrapper').append(battlefield);
-
-    } else {
-      this.chooseEnemy(a);
-    }
-
+      this.updatePlayerDash();
+      $('.actionArea').text('Choose a foe');
   },
 
   stageEnemies: function () {
@@ -144,10 +141,13 @@ var rpgGame = {
   },
 
   chooseEnemy: function (a) {
-    $('.characterSelect').toggle('slow');
+    $('.characterSelect').fadeTo("fast", 0);
     this.enemyChosen = a;
+    $('.enemyStats').text(this.characters[a].name);
     $('.enemy').empty().append(this.characterCard(this.characters[a], a, 'chosenCompetitor'));
-    $('#chooseNew').remove();
+    
+    //$('#chooseNew').remove();
+    
     $('.battlefield').append('<div class="controls"><button id="attack">Attack!</button>');
 
     $('#attack').click(function () {
