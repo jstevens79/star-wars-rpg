@@ -67,15 +67,14 @@ var rpgGame = {
 
   },
 
-  characterCard: function (a, ind, classy) {
+  characterCard: function (a, classy) {
     // setup and return a character card
-    var defeatedCheck = (a.defeated) ? ' defeated' : '';
+    var classCheck = (a.defeated) ? ' defeated' : classy;
     
     var card = $("<div>")
       .addClass('characterCard')
-      .addClass(classy)
-      .addClass(defeatedCheck)
-      .attr('data-character', ind)
+      .addClass(classCheck)
+      .attr('data-character', this.characters.indexOf(a))
       .append("<img alt='" + a.name + "' src='" + a.image + "'>");
 
     var stats = $("<div>")
@@ -94,15 +93,19 @@ var rpgGame = {
     $('.characterCard').each(function(i, obj) {
       var c = $(this).data("character");
       $(this).find('.health').text(rpgGame.characters[c].health)
+      if(rpgGame.characters[c].health === 0) {
+        $(this).removeClass('select').addClass('defeated')
+      }
     })
     // update the chosen player stats
+    console.log(rpgGame.characters[rpgGame.playerChosen].currentAttack)
     $('.controls').find('.health').text(rpgGame.characters[rpgGame.playerChosen].health);
-    $('.controls').find('.attack').text(rpgGame.characters[rpgGame.playerChosen].currentAttack);
+    $('.controls').find('.attackStat').text(rpgGame.characters[rpgGame.playerChosen].currentAttack);
   },
 
   stageCharacters: function () {
     $.each(this.characters, function (index, value) {
-      $('.characterSelect').append(this.characterCard(value, index, 'select'));
+      $('.characterSelect').append(this.characterCard(value, 'select'));
     }.bind(this))
 
     $('.select').click(function () {
@@ -118,7 +121,7 @@ var rpgGame = {
   choosePlayer: function (a) {
       this.playerChosen = a;
       this.updatePlayerDash();
-      $('.instructions').text('Choose your foe');
+      $('.instructions').text('Choose your foe.');
       $('.controls').toggle("slow");
   },
 
@@ -132,36 +135,16 @@ var rpgGame = {
     var playerName = $('<h3>').text(player.name);
     var powers = $('<div>')
       .addClass('powerStats')
-      .append("<div class='stats'><i class='fas fa-heart'></i></i> <span class='health'>" + player.health + "</span> <span class='blue'>// Attack Power: <span class='attack'>" + player.currentAttack + "</span><span></div>"); 
+      .append("<div class='stats'><i class='fas fa-heart'></i></i> <span class='health'>" + player.health + "</span> <span class='blue'>// Attack Power: <span class='attackStat'>" + player.currentAttack + "</span><span></div>"); 
     
 
     $('.controls').append(yourPlayer).append(playerPic).append(playerName).append(powers);
   },
-
-  stageEnemies: function () {
-    $('#competitors').empty();
-    $('#instructions').empty().append('<p>Choose your opponent.</p>');
-
-    $.each(this.characters, function (index, value) {
-      if (index !== this.playerChosen) {
-        $('#competitors').append(this.characterCard(value, index, 'selectCompetitor'));
-      }
-    }.bind(this))
-
-    $('.selectCompetitor').not('.defeated').click(function () {
-      $('#chooseNew').off();
-      $('#chooseNew').remove();
-      $('.selectCompetitor').off();
-      rpgGame.chooseEnemy($(this).data('character'));
-    });
-
-    $('#chooseNew').click(function () {
-      rpgGame.setupGame();
-    })
-  },
-
+  
   chooseEnemy: function (a) {
     this.enemyChosen = a;
+
+    $('.instructions').text('Fight!');
 
     $('.characterSelect').fadeTo("fast", 0, function() {
       var battle = $('<div>').addClass('battle');
@@ -179,6 +162,7 @@ var rpgGame = {
 
       $('.attack').click(function () {
         if (!rpgGame.attacking) {
+          $(this).addClass('disabled');
           rpgGame.attack();
         }
       })
@@ -188,50 +172,69 @@ var rpgGame = {
     
   },
 
+  continueGame: function() {
+    $('.battle').fadeTo("fast", 0, function(){
+      $(this).remove();
+      $('.characterSelect').fadeTo("fast", 1);
+    })
+  },
+
   attack: function () {
     var Player = this.characters[this.playerChosen];
     var Enemy = this.characters[this.enemyChosen];
     this.attacking = true;
 
     // attack the enemy
+    $('[data-character="' + this.enemyChosen + '"]').addClass('gettingAttacked');
     var updatedEnemyHealth = Enemy.health - Player.currentAttack;
     Enemy.health = (updatedEnemyHealth <= 0) ? 0 : updatedEnemyHealth;
     Enemy.defeated = (Enemy.health === 0) ? true : false;
     // increase the attack power
-    console.log(Player.currentAttack);
     Player.currentAttack = Player.currentAttack + Player.attack;
-    console.log(Player.currentAttack);
-    this.reRenderCards();
 
+    setTimeout(function() {
+      this.reRenderCards();
+      $('[data-character="' + this.enemyChosen + '"]').removeClass('gettingAttacked');
+      $('[data-character="' + this.playerChosen + '"]').addClass('gettingAttacked');
+    }.bind(this), 1200)
+    
     setTimeout(function() {
       var updatedHealth = Player.health - Enemy.counterAttack;
       Player.health = (updatedHealth <= 0) ? 0 : updatedHealth;
       this.reRenderCards();
       this.attacking = false;
-
       this.score();
-    }.bind(this), 1500)
+      $('[data-character="' + this.playerChosen + '"]').removeClass('gettingAttacked');
+    }.bind(this), 2400)
     
   },
 
   score: function () {
     var playerDefeated = (this.characters[this.playerChosen].health <= 0) ? true : false;
     var enemyDefeated = (this.characters[this.enemyChosen].health <= 0) ? true : false;
-
+    
     if (playerDefeated) {
-      $('#attack').remove();
-      this.restartGameButton('Try again');
+      $('.attack').remove();
+      $('.attackBar').append('<button onclick="rpgGame.setupGame()">You lost. Try again.</button>');
+      return;
     }
 
     if (enemyDefeated) {
+      $('.attack').remove();
       setTimeout(function() {
-        this.stageEnemies();
-        $('#attack').remove();
         if (this.checkIfAllDefeated()) {
+          alert('play again')
           this.restartGameButton('Play again');
+          $('.attackBar').append('<button onclick="rpgGame.setupGame()">You won! Play again?</button>');
+        } else {
+          this.continueGame();
+          $('.instructions').text('Choose your foe.');
         }
-      }.bind(this), 1500);
+      }.bind(this), 1200);
     }
+
+    $('.disabled').removeClass('disabled');
+
   },
 
   checkIfAllDefeated: function() {
@@ -247,10 +250,6 @@ var rpgGame = {
     return allDefeated;
   },
 
-  restartGameButton: function(a) {
-    console.log('yeah..')
-    $('#gameWrapper').append('<button onclick="rpgGame.setupGame()" id="restart">' + a + '</button>');
-  }
 
 }
 

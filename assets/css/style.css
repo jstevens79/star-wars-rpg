@@ -88,8 +88,43 @@ header {
   flex-direction: column;
   align-items: stretch;
   box-shadow: 0 0 0 transparent;
+  position: relative;
   transform: scale(1);
   transition: transform .25s ease-in-out, box-shadow .25s ease;
+}
+
+.characterCard.defeated::before {
+  content: 'defeated';
+  position: absolute;
+  z-index: 100;
+  background: rgba(0,0,0,0.8);
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-transform: uppercase;
+  font-size: 1.2em;
+  letter-spacing: 2px;
+}
+
+.characterCard.gettingAttacked::before {
+  content: '';
+  position: absolute;
+  z-index: 100;
+  background: #e15021;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  opacity: 0;
+  transition: opacity .25s ease;
+  animation: flashing .25s linear 0s 10 forwards;
+}
+
+@keyframes flashing {
+  0% { opacity: 0; }
+  50% { opacity: 0.5; }
+  100% { opacity: 0; }
 }
 
 .characterCard img {
@@ -156,7 +191,7 @@ header {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  align-content: stretch;
+  align-content: center;
   justify-content: center;
 }
 
@@ -181,14 +216,10 @@ header {
 }
 
 
-/*-- -- */
-
-.player {
+/* .player {
   flex: 1;
   padding: 10px;
-}
-
-
+} */
 
 .player .characterCard {
   min-width: calc(100% - 40px);
@@ -254,18 +285,41 @@ header {
 }
 
 button {
-  background: #4373BF;
+  background: rgb(121, 168, 243);
   border: none;
   outline: none;
-  padding: 20px 40px;
-  border-radius: 8px;
+  padding: 20px 60px;
+  border-bottom: solid 6px #4373BF;
+  border-right: solid 2px #4373BF;
+  border-radius: 0px 8px 0px 8px;
   font-weight: 700;
   cursor: pointer;
   font-size: 1.3em;
   color: white;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-shadow: 1px 2px 0px rgba(0,0,0,0.4);
 }
 
 button:hover {
-  background: blue;
+  background: #4373BF;
+  border-bottom: solid 6px rgb(50, 87, 148);;
+  border-right: solid 2px rgb(50, 87, 148);;
   color: white;
+}
+
+button:active {
+  background: rgb(50, 87, 148);
+  color: white;
+}
+
+button.disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+button:hover, button:active {
+  background: rgb(121, 168, 243);
+  border-bottom: solid 6px #4373BF;
+  border-right: solid 2px #4373BF;
 }
