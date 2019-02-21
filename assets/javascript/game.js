@@ -12,6 +12,10 @@ var rpgGame = {
     this.playerChosen = null;
     this.enemyChosen = null;
 
+    var header = $('<header>');
+    header.append('<image class="logo" alt="star wars logo" src="' + './assets/images/Star_Wars_Logo.png' + '">');
+    $('#gameWrapper').append(header);
+
     // create characters object
     this.generateCharacters();
 
@@ -22,13 +26,7 @@ var rpgGame = {
     stage.append(characterSelect);
 
     // setup the controls area
-    var controls = $('<div>').addClass('controls');
-    var playerStats = $('<div>').addClass('playerStats').text('player stats');
-    var actionArea = $('<div>').addClass('actionArea').text('Choose your player');
-    var gameStats = $('<div>').addClass('enemyStats').text('foe');
-
-    controls.append(playerStats).append(actionArea).append(gameStats);
-    
+    var controls = $('<div>').addClass('controls').toggle();    
     $('#gameWrapper').append(stage).append(controls);
 
     // add characters to characterSelect
@@ -77,16 +75,12 @@ var rpgGame = {
     var stats = $("<div>")
       .addClass('characterStats')
       .append("<h3>" + a.name + "</h3>")
-      .append("<span class='stats'>// " + a.health + "</span>");
+      .append("<span class='stats'><i class='fas fa-heart'></i></i> " + a.health + "</span>");
 
     card.append(stats);
 
     return card;
     
-  },
-
-  updatePlayerDash: function () {
-    $('.playerStats').text(this.characters[this.playerChosen].name)
   },
 
   reRenderCards: function () {
@@ -115,7 +109,23 @@ var rpgGame = {
   choosePlayer: function (a) {
       this.playerChosen = a;
       this.updatePlayerDash();
-      $('.actionArea').text('Choose a foe');
+      $('.controls').toggle("slow");
+  },
+
+  updatePlayerDash: function () {
+    var player = this.characters[this.playerChosen];
+    var playerPic = $('<img>')
+      .attr('src', player.image)
+      .attr('alt', player.name + '_icon')
+      .addClass('playerIcon');
+    var yourPlayer = $('<h1>').text('Your player');
+    var playerName = $('<h3>').text(player.name);
+    var powers = $('<div>')
+      .addClass('powerStats')
+      .append("<div class='stats'><i class='fas fa-heart'></i></i> " + player.health + " <span class='blue'>// Attack Power: " + player.currentAttack + "<span></div>"); 
+    
+
+    $('.controls').append(yourPlayer).append(playerPic).append(playerName).append(powers);
   },
 
   stageEnemies: function () {
