@@ -12,12 +12,16 @@ var rpgGame = {
     this.playerChosen = null;
     this.enemyChosen = null;
 
-    // setup character select area
-    $('#gameWrapper').append('<div id="characterSelect"></div>');
-    // generateCharacters
+    // create characters object
     this.generateCharacters();
+
+    // setup character select area
+    var characterSelect = $("<div>").addClass("characterSelect");
+    //characterSelect.prepend('<div id="instructions"><p>Select your player.</p></div>')
+    $('#gameWrapper').append(characterSelect);
+    
+    // add characters to characterSelect
     this.stageCharacters();
-    $('#gameWrapper').prepend('<div id="instructions"><p>Select your player.</p></div>');
   },
 
   generateCharacters: function () {
@@ -36,12 +40,12 @@ var rpgGame = {
     }
 
     //name, health, attack, counterAttack
+    addCharacter('luke skywalker', 160, 20, 15);
     addCharacter('darth vader', 200, 25, 22);
     addCharacter('yoda', 190, 24, 20);
-    addCharacter('luke skywalker', 160, 20, 15);
     addCharacter('kylo ren', 140, 18, 20);
     addCharacter('rey', 130, 15, 15);
-    addCharacter('boba fett', 120, 10, 15);
+    //addCharacter('boba fett', 120, 10, 15);
     addCharacter('chewbacca', 160, 22, 25);
 
   },
@@ -49,41 +53,71 @@ var rpgGame = {
   characterCard: function (a, ind, classy) {
     // setup and return a character card
     var defeatedCheck = (a.defeated) ? ' defeated' : '';
-    return "<div class='characterCard " + classy + defeatedCheck + "' data-character='" + ind + "'><h3>" 
-      + a.name + "</h3><div class='stats'>" + a.health + "</div></div>"
+    
+    var card = $("<div>")
+      .addClass('characterCard')
+      .addClass(classy)
+      .addClass(defeatedCheck)
+      .attr('data-character', ind)
+      .append("<img src='https://via.placeholder.com/260x140'>");
+
+    var stats = $("<div>")
+      .addClass('characterStats')
+      .append("<h3>" + a.name + "</h3>")
+      .append("<span class='stats'>// " + a.health + "</span>");
+
+    card.append(stats);
+
+    return card;
+    
   },
 
   reRenderCards: function () {
     // maybe just change out health here?
-    $('#player1').empty();
-    $('#player1').append(this.characterCard(this.characters[this.playerChosen], this.playerChosen, 'chosen'));
+    $('.player').empty();
+    $('.player').append(this.characterCard(this.characters[this.playerChosen], this.playerChosen, 'chosen'));
     $('#competitors').empty();
     $('#competitors').append(this.characterCard(this.characters[this.enemyChosen], this.enemyChosen, 'chosenCompetitor'));
   },
 
   stageCharacters: function () {
     $.each(this.characters, function (index, value) {
-      $('#characterSelect').append(this.characterCard(value, index, 'select'));
+      $('.characterSelect').append(this.characterCard(value, index, 'select'));
     }.bind(this))
 
     $('.select').click(function () {
       rpgGame.choosePlayer($(this).data("character"))
+      $(this).remove();
     })
   },
 
   choosePlayer: function (a) {
-    this.playerChosen = a;
 
-    // clear board and setup competion layout
-    $('.select').off();
-    $('#characterSelect').remove();
-    $('#gameWrapper').append('<div id="battlefield"></div>');
-    $('#battlefield').append('<div id="player1"><button id="chooseNew">Change character.</button></div>');
-    $('#battlefield').append('<div id="competitors"></div>');
+    if ( this.playerChosen === null ) {
 
-    $('#player1').prepend(this.characterCard(this.characters[a], a, 'chosen'));
+      this.playerChosen = a;
+    
+      var battlefield = $('<div>').addClass('battlefield');
+      
+      var battlefieldControls = $('<div>').addClass('battlefieldControls');
+      battlefieldControls.append('<button id="chooseNew">Change character</button>');
 
-    this.stageEnemies();
+      var battlingCharacters = $('<div>').addClass('battlingCharacters');
+      
+      var player = $('<div>').addClass('player');
+      player.prepend(this.characterCard(this.characters[a], a, 'chosen'));
+
+      var enemy = $('<div>').addClass('enemy').text('Choose an enemy');
+
+      battlingCharacters.append(player).append(enemy);
+
+      battlefield.append(battlingCharacters).append(battlefieldControls);
+
+      $('#gameWrapper').append(battlefield);
+
+    } else {
+      this.chooseEnemy(a);
+    }
 
   },
 
@@ -110,10 +144,11 @@ var rpgGame = {
   },
 
   chooseEnemy: function (a) {
-    $('#competitors').empty();
+    $('.characterSelect').toggle('slow');
     this.enemyChosen = a;
-    $('#competitors').append(this.characterCard(this.characters[a], a, 'chosenCompetitor'));
-    $('#battlefield').append('<div class="controls"><button id="attack">Attack!</button>');
+    $('.enemy').empty().append(this.characterCard(this.characters[a], a, 'chosenCompetitor'));
+    $('#chooseNew').remove();
+    $('.battlefield').append('<div class="controls"><button id="attack">Attack!</button>');
 
     $('#attack').click(function () {
       if (!rpgGame.attacking) {
@@ -166,7 +201,6 @@ var rpgGame = {
         }
       }.bind(this), 1500);
     }
-
   },
 
   checkIfAllDefeated: function() {

@@ -3,52 +3,137 @@
   box-sizing: border-box;
 }
 
-.gameWrapper {
+html, body {
   width: 100%;
   height: 100%;
+}
+
+body {
+  color: #9B9B9B;
+  background: #151515;
+  font-family: 'Roboto Condensed', sans-serif;
+  background-image: url('../images/bg_starsL-fd4661a3ccea.jpg'), url('../images/bg_starsR-655c85e404d4.jpg');
+  background-repeat: repeat-y;
+  background-position: left bottom, right bottom;
+}
+
+#gameWrapper {
+  margin: 20px auto;
+  width: 100%;
+  height: 100%;
+  max-width: 980px;
   position: relative;
 }
 
-#characterSelect {
-  background: gray;
-  width: calc(100% - 60px);
+.characterSelect {
+  width: 100%;
+  margin: 0 auto;
   display: flex;
   flex-wrap: wrap;
+  border-radius: 8px;
+  justify-content: center;
+  border-radius: 8px;
+  background: rgba(0,0,0,0.4);
+  padding: 20px;
+  margin-bottom: 20px;
 }
 
 .characterCard {
-  padding: 20px;
   border-radius: 8px;
   background: white;
   margin: 10px;
-  flex: 1 1 0;
+  flex: 0;
   text-align: center;
-  min-width: 200px;
-  max-width: 300px;
+  min-width: 260px;
   min-height: 200px;
+  background: #282727;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  box-shadow: 0 0 0 transparent;
+  transform: scale(1);
+  transition: transform .25s ease-in-out, box-shadow .25s ease;
 }
 
-#player1 {
+.characterCard:hover {
+  box-shadow: 0 0 13px #4373BF;
+  transform: scale(1.05);
+}
+
+.characterCard:hover h3 {
+  color: #4373BF;
+}
+
+.characterCard img {
+  flex: 0;
+}
+
+.characterStats {
+  border-top: solid 5px #4373BF;
+  flex: 1;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.characterCard h3 {
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.stats {
+  color: #e15021;
+  font-size: .8em;
+}
+
+.player {
   flex: 1;
   padding: 10px;
 }
 
 .chosenCompetitor {
-  min-width: auto;
   max-width: calc(100% - 40px);
 }
 
-#player1 .characterCard {
+.player .characterCard {
   min-width: calc(100% - 40px);
   width: calc(100% - 40px);
 }
 
-#battlefield {
-  background: black;
+/* ---- battlefield area ---- */
+
+.battlefield {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  max-height: 100%;
+  background: black;
+  border-radius: 8px;
+}
+
+.battlingCharacters {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.battlingCharacters .player, .enemy {
+  flex: 1;
+  max-width: 260px;
+  border: 1px solid gray;
+  border-radius: 8px;
+}
+
+.battlefieldControls {
+  padding: 20px;
+}
+
+.battlefield #competitors {
+  flex: 1.4;
 }
 
 .controls {
@@ -61,10 +146,33 @@
   flex-wrap: wrap;
 }
 
+
 .select:hover, .selectCompetitor:hover {
   cursor: pointer;
 }
 
 .defeated:hover {
   cursor: default;
+}
+
+#instructions {
+  color: white;
+  font-size: 1.4em;
+  text-align: center;
+  padding: 20px 0;
+}
+
+button {
+  background: gray;
+  border: none;
+  outline: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+button:hover {
+  background: blue;
+  color: white;
 }
